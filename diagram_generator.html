@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>   
+    
+    <title>The Diagram Generator</title>    
+
+  </head>
+     <body>
+       
+    <style>
+      .chart {
+        width: 100%;
+        height: 300px;
+        position: relative;
+        background-color: #c4bdbd;
+      }
+      .bar {
+        fill: #2196f3;
+        transition: all 0.3s;
+      }
+      .bar:hover {
+        fill: #1565c0;
+        cursor: pointer;
+      }
+      .bar-label {
+        font-size: 14px;
+        font-weight: bold;
+        fill: #333;
+        text-anchor: end;
+        
+      }
+      .bar-value {
+        font-size: 14px;
+        font-weight: bold;
+        fill: #fff;
+        text-anchor: middle;
+        
+      }
+      .x-axis {
+        stroke: #ccc;
+        stroke-width: 1px;
+      }
+      .x-axis-label {
+        font-size: 14px;
+        font-weight: bold;
+        fill: #333;
+        text-anchor: middle;
+        
+      }
+    </style>
+   
+    <div id="app">
+      <bar-chart :data="[
+        { label: 'Chrome', value: '65%' },
+        { label: 'Firefox', value: '20%' },
+        { label: 'Safari', value: '10%' },
+        { label: 'Edge', value: '5%' }
+      ]"></bar-chart>
+    </div>
+    <script>
+      const { createApp } = Vue;
+
+      const Bar = {
+        props: ['label', 'value'],
+        template: `
+          <g>
+            <rect class="bar" :width="valueToX(value)" height="40" />
+            <text class="bar-label" :x="valueToX(value) - 5" y="20">{{ label }}</text>
+            <text class="bar-value" :x="valueToX(value)" y="60">{{ value }}</text>
+          </g>
+        `,
+        methods: {
+          valueToX(value) {
+            const width = this.$parent.width - 50;
+            const percent = parseInt(value) / 100;
+            return Math.floor(percent * width);
+          },
+        },
+      };
+
+      const BarChart = {
+        props: ['data'],
+        components: { Bar },
+        template: `
+          <svg class="chart" :width="width" :height="height">
+            <g v-for="(item, index) in data" :key="index" :transform="'translate(0, ' + (50 + 50 * index) + ')'">
+              <bar :label="item.label" :value="item.value"></bar>
+            </g>
+            <line class="x-axis" x1="0" y1="0" :x2="width" y2="0" />
+            <text class="x-axis-label" :x="width / 2" :y="height - 10">Market Share (%)</text>
+          </svg>
+        `,
+        data() {
+          return {
+            width: 1000,
+            height: 200,
+          };
+        },
+      };
+
+      createApp({
+        components: {
+          'bar-chart': BarChart,
+        },
+      }).mount('#app');
+    </script>
+ 
+
+      </body>
+    </html>
+    
+    
+     
+        
+    
